@@ -1,6 +1,11 @@
 import { ApolloClient, ApolloLink, HttpLink, InMemoryCache, concat } from '@apollo/client';
 
-
+/**
+ * 
+ * @param uri GraphQL Host URL
+ * @param token Personal Access Token (PAT)
+ * @returns {ApolloClient} ApolloClient instance to be used as a provider prop
+ */
 const getClient = (uri: string, token: string) => {
   const httpLink = new HttpLink({
     uri,

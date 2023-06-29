@@ -13,6 +13,7 @@ import {
 import { renderContributorsList, renderReviewersList } from './render';
 import { Author, Reviewer } from './types';
 import pacMan from '../../assets/bean-eater.gif';
+import GlobalStats from '../GlobalStats';
 
 const BASE_URL = import.meta.env.VITE_GITLAB_HOST;
 
@@ -147,6 +148,7 @@ export default function Stats() {
                 {p.fullPath}
               </a>
             </h3>
+            <GlobalStats project={project!} />
             {(project &&
               (p.mergeRequests as MergeMetricsMergeRequestConnectionFragment)
                 .count > 0 && (

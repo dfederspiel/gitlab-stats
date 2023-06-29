@@ -1,6 +1,10 @@
-import { MergeMetricsDiffStatsFragment, MergeMetricsMergeRequestConnectionFragment, MergeMetricsMergeRequestFragment, MergeMetricsUserCoreFragment } from '../../gql/graphql';
+import { MergeMetricsDiffStatsFragment, MergeMetricsMergeRequestConnectionFragment, MergeMetricsMergeRequestFragment, MergeMetricsUserCoreFragment } from '../../graphql/gitlab/graphql';
 import { Author, Reviewer } from './types';
 
+// TODO: use fragments to eliminate most of the data mapping
+// using more than one graphql query will help reduce mapping complexity as well
+
+// TODO: fix fragment usage to prevent "any" types
 export function mapAuthorMetricsFromMergeRequests(
   nodes: MergeMetricsMergeRequestFragment[]
 ) {

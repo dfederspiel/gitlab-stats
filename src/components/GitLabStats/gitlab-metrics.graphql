@@ -1,0 +1,58 @@
+fragment MergeMetricsDiffStats on DiffStatsSummary {
+  additions
+  changes
+  deletions
+  fileCount
+}
+
+fragment MergeMetricsUserCore on UserCore {
+  name
+  id
+  avatarUrl
+}
+
+fragment MergeMetricsMergeRequest on MergeRequest {
+  commits {
+    nodes {
+      title
+    }
+  }
+  author {
+    name
+    id
+    avatarUrl
+  }
+  approvedBy {
+    nodes {
+      ...MergeMetricsUserCore
+    }
+  }
+  diffStatsSummary {
+    ...MergeMetricsDiffStats
+  }
+}
+
+fragment MergeMetricsMergeRequestConnection on MergeRequestConnection {
+  count
+  totalTimeToMerge
+  nodes {
+    ...MergeMetricsMergeRequest
+  }
+}
+
+fragment MergeMetricsProject on Project {
+  id
+  name
+  fullPath
+  mergeRequests(mergedAfter: $mergedAfter) {
+    ...MergeMetricsMergeRequestConnection
+  }
+}
+
+query MergeMetrics($projectIds: [ID!]!, $mergedAfter: Time!) {
+  projects(ids: $projectIds) {
+    nodes {
+      ...MergeMetricsProject
+    }
+  }
+}

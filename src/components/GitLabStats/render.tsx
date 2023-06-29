@@ -2,6 +2,8 @@ import { MergeMetricsMergeRequestConnectionFragment } from '../../graphql/gitlab
 import { mapAuthorMetricsFromMergeRequestConnection, mapReviewersFromMergeRequestConnection } from './helpers';
 import { Author, Reviewer } from './types';
 
+
+// TODO: This is bad convention. Refactor into individual components
 const BASE_URL = import.meta.env.VITE_GITLAB_HOST;
 
 export function renderContributorsList(

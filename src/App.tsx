@@ -22,8 +22,12 @@ function App() {
         import.meta.env.VITE_GITLAB_PAT
       )}
     >
-      <Menu />
-      <Outlet />
+      <div className='header'>
+        <Menu />
+      </div>
+      <div className='content'>
+        <Outlet />
+      </div>
     </ApolloProvider>
   );
 }

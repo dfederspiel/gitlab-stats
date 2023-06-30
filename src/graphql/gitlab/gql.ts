@@ -13,6 +13,7 @@ import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/
  * Therefore it is highly recommended to use the babel or swc plugin for production.
  */
 const documents = {
+    "\n  fragment AvatarUserFragment on UserCore {\n    avatarUrl\n  }\n": types.AvatarUserFragmentFragmentDoc,
     "fragment MergeMetricsDiffStats on DiffStatsSummary {\n  additions\n  changes\n  deletions\n  fileCount\n}\n\nfragment MergeMetricsUserCore on UserCore {\n  name\n  id\n  avatarUrl\n}\n\nfragment MergeMetricsMergeRequest on MergeRequest {\n  commits {\n    nodes {\n      title\n    }\n  }\n  author {\n    name\n    id\n    avatarUrl\n  }\n  approvedBy {\n    nodes {\n      ...MergeMetricsUserCore\n    }\n  }\n  diffStatsSummary {\n    ...MergeMetricsDiffStats\n  }\n}\n\nfragment MergeMetricsMergeRequestConnection on MergeRequestConnection {\n  count\n  totalTimeToMerge\n  nodes {\n    ...MergeMetricsMergeRequest\n  }\n}\n\nfragment MergeMetricsProject on Project {\n  id\n  name\n  fullPath\n  mergeRequests(mergedAfter: $mergedAfter) {\n    ...MergeMetricsMergeRequestConnection\n  }\n}\n\nquery MergeMetrics($projectIds: [ID!]!, $mergedAfter: Time!) {\n  projects(ids: $projectIds) {\n    nodes {\n      ...MergeMetricsProject\n    }\n  }\n}": types.MergeMetricsDiffStatsFragmentDoc,
 };
 
@@ -30,6 +31,10 @@ const documents = {
  */
 export function graphql(source: string): unknown;
 
+/**
+ * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function graphql(source: "\n  fragment AvatarUserFragment on UserCore {\n    avatarUrl\n  }\n"): (typeof documents)["\n  fragment AvatarUserFragment on UserCore {\n    avatarUrl\n  }\n"];
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

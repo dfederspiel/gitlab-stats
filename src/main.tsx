@@ -6,8 +6,8 @@ import {
   RouterProvider,
   createBrowserRouter,
 } from 'react-router-dom';
-import GitLabStats from './components/GitLabStats/GitLabStats.tsx';
 import ErrorPage from './components/ErrorPage.tsx';
+import GitLabStats from './components/GitLabStats/GitLabStats.tsx';
 
 const router = createBrowserRouter([
   {

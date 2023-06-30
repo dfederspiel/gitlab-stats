@@ -1,33 +1,79 @@
-import { MergeMetricsDiffStatsFragment, MergeMetricsMergeRequestConnectionFragment, MergeMetricsMergeRequestFragment, MergeMetricsUserCoreFragment } from '../../graphql/gitlab/graphql';
+import { FragmentType, getFragmentData } from '../../graphql/gitlab';
+import { MergeMetricsDiffStatsFragmentDoc, MergeMetricsMergeRequestConnectionFragment, MergeMetricsMergeRequestConnectionFragmentDoc, MergeMetricsMergeRequestFragment, MergeMetricsMergeRequestFragmentDoc, MergeMetricsProjectFragmentDoc, MergeMetricsQuery, MergeMetricsUserCoreFragmentDoc } from '../../graphql/gitlab/graphql';
 import { Author, Reviewer } from './types';
 
-// TODO: use fragments to eliminate most of the data mapping
-// using more than one graphql query will help reduce mapping complexity as well
+export const getTopContributors = (data?: MergeMetricsQuery) => {
+  let topAuthors: Author[] = [];
+  let topReviewers: Reviewer[] = [];
+  if (data?.projects) {
+    const mergeRequests: MergeMetricsMergeRequestFragment[] = [];
+    data.projects.nodes?.forEach((project) => {
+      if (project) mergeRequests.push(...getProjectMergeRequests(project))
+    });
+    const projectAuthors = getAuthorMetricsFromMergeRequests(mergeRequests);
+    const projectReviewers = getReviewersFromMergeRequests(mergeRequests);
 
-// TODO: fix fragment usage to prevent "any" types
-export function mapAuthorMetricsFromMergeRequests(
+    projectAuthors.sort((a, b) => (a.mergeRequests > b.mergeRequests ? -1 : 1));
+    projectReviewers.sort((a, b) =>
+      a.timesReviewed > b.timesReviewed ? -1 : 1
+    );
+    topAuthors = projectAuthors;
+    topReviewers = projectReviewers;
+  }
+  return {
+    topAuthors,
+    topReviewers
+  }
+}
+
+export const getProjectMergeRequests = (project: FragmentType<typeof MergeMetricsProjectFragmentDoc>) => {
+  const mergeRequests: MergeMetricsMergeRequestFragment[] = [];
+  const projectFragment = getFragmentData(
+    MergeMetricsProjectFragmentDoc,
+    project
+  );
+  const mergeRequestConnectionFragment = getFragmentData(
+    MergeMetricsMergeRequestConnectionFragmentDoc,
+    projectFragment.mergeRequests
+  );
+
+  mergeRequestConnectionFragment?.nodes?.forEach(
+    (mergeRequestFragment) => {
+      const mergeRequest = getFragmentData(
+        MergeMetricsMergeRequestFragmentDoc,
+        mergeRequestFragment
+      );
+      if (mergeRequest) mergeRequests.push(mergeRequest);
+    }
+  );
+  return mergeRequests;
+};
+
+
+export function getAuthorMetricsFromMergeRequests(
   nodes: MergeMetricsMergeRequestFragment[]
 ) {
   const authors: Author[] = [];
 
-  for (const x of nodes) {
-    const a = authors.find((a) => a.name === x?.author?.name);
-    const diff = x.diffStatsSummary as MergeMetricsDiffStatsFragment;
+  for (const request of nodes) {
+    const author = authors.find((a) => a.name === request?.author?.name);
+    const diff = getFragmentData(MergeMetricsDiffStatsFragmentDoc, request.diffStatsSummary);
+    if (!diff) continue;
 
-    if (a && x?.diffStatsSummary) {
-      a.additions += diff.additions;
-      a.changes += diff.changes;
-      a.deletions += diff.deletions;
-      a.fileCount += diff.fileCount;
-      a.commits += x.commits?.nodes?.length || 0;
-      a.mergeRequests += 1;
+    if (author && request?.diffStatsSummary) {
+      author.additions += diff.additions;
+      author.changes += diff.changes;
+      author.deletions += diff.deletions;
+      author.fileCount += diff.fileCount;
+      author.commits += request.commits?.nodes?.length || 0;
+      author.mergeRequests += 1;
     } else {
-      if (x?.author && x.diffStatsSummary && x.commits?.nodes)
+      if (request?.author && request.diffStatsSummary && request.commits?.nodes)
         authors.push({
-          name: x.author.name,
-          avatarUrl: x.author.avatarUrl || '',
+          name: request.author.name,
+          avatarUrl: request.author.avatarUrl || '',
           additions: diff.additions,
-          commits: x.commits.nodes.length,
+          commits: request.commits.nodes.length,
           changes: diff.changes,
           deletions: diff.deletions,
           fileCount: diff.fileCount,
@@ -38,14 +84,14 @@ export function mapAuthorMetricsFromMergeRequests(
   return authors;
 }
 
-export function mapReviewersFromMergeRequests(
+export function getReviewersFromMergeRequests(
   nodes: MergeMetricsMergeRequestFragment[]
 ) {
   const reviewers: Reviewer[] = [];
 
   for (const x of nodes) {
     x?.approvedBy?.nodes?.forEach((y) => {
-      const z = y as MergeMetricsUserCoreFragment;
+      const z = getFragmentData(MergeMetricsUserCoreFragmentDoc, y);
       const reviewer = reviewers.find((r) => r.name === z?.name);
       if (!reviewer) {
         reviewers.push({
@@ -61,29 +107,31 @@ export function mapReviewersFromMergeRequests(
   return reviewers;
 }
 
-export function mapAuthorMetricsFromMergeRequestConnection(
-  nodes: MergeMetricsMergeRequestConnectionFragment
+export function getAuthorMetricsFromMergeRequestConnection(
+  connection: MergeMetricsMergeRequestConnectionFragment
 ) {
   const authors: Author[] = [];
+  if (!connection.nodes) return authors;
 
-  for (const x of nodes.nodes as MergeMetricsMergeRequestFragment[]) {
-    const a = authors.find((a) => a.name === x?.author?.name);
-    const diff = x.diffStatsSummary as MergeMetricsDiffStatsFragment;
+  for (const projectFragment of connection.nodes) {
+    const project = getFragmentData(MergeMetricsMergeRequestFragmentDoc, projectFragment);
+    const author = authors.find((a) => a.name === project?.author?.name);
+    const diff = getFragmentData(MergeMetricsDiffStatsFragmentDoc, project?.diffStatsSummary);
 
-    if (a && x?.diffStatsSummary) {
-      a.additions += diff.additions;
-      a.changes += diff.changes;
-      a.deletions += diff.deletions;
-      a.fileCount += diff.fileCount;
-      a.commits += x.commits?.nodes?.length || 0;
-      a.mergeRequests += 1;
+    if (project && author && diff) {
+      author.additions += diff.additions;
+      author.changes += diff.changes;
+      author.deletions += diff.deletions;
+      author.fileCount += diff.fileCount;
+      author.commits += project.commits?.nodes?.length || 0;
+      author.mergeRequests += 1;
     } else {
-      if (x?.author && x.diffStatsSummary && x.commits?.nodes)
+      if (project?.author && diff && project.commits?.nodes)
         authors.push({
-          name: x.author.name,
-          avatarUrl: x.author.avatarUrl || '',
+          name: project.author.name,
+          avatarUrl: project.author.avatarUrl || '',
           additions: diff.additions,
-          commits: x.commits.nodes.length,
+          commits: project.commits.nodes.length,
           changes: diff.changes,
           deletions: diff.deletions,
           fileCount: diff.fileCount,
@@ -94,19 +142,21 @@ export function mapAuthorMetricsFromMergeRequestConnection(
   return authors;
 }
 
-export function mapReviewersFromMergeRequestConnection(
-  nodes: MergeMetricsMergeRequestConnectionFragment
+export function getReviewersFromMergeRequestConnection(
+  connection: MergeMetricsMergeRequestConnectionFragment
 ) {
   const reviewers: Reviewer[] = [];
+  if (!connection.nodes) return reviewers;
 
-  for (const x of nodes.nodes as MergeMetricsMergeRequestFragment[]) {
-    x?.approvedBy?.nodes?.forEach((y) => {
-      const z = y as MergeMetricsUserCoreFragment;
-      const reviewer = reviewers.find((r) => r.name === z?.name);
+  for (const projectFragment of connection.nodes) {
+    const project = getFragmentData(MergeMetricsMergeRequestFragmentDoc, projectFragment);
+    project?.approvedBy?.nodes?.forEach((userFragment) => {
+      const user = getFragmentData(MergeMetricsUserCoreFragmentDoc, userFragment)
+      const reviewer = reviewers.find((r) => r.name === user?.name);
       if (!reviewer) {
         reviewers.push({
-          name: z?.name || '',
-          avatarUrl: z?.avatarUrl || '',
+          name: user?.name || '',
+          avatarUrl: user?.avatarUrl || '',
           timesReviewed: 1,
         });
       } else {

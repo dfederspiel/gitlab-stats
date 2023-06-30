@@ -2,20 +2,16 @@ import { useLazyQuery } from '@apollo/client';
 import { useRef } from 'react';
 import {
   MergeMetricsDocument,
-  MergeMetricsMergeRequestFragment,
-  MergeMetricsProjectFragment,
-  MergeMetricsMergeRequestConnectionFragment,
+  MergeMetricsProjectFragmentDoc,
+  MergeMetricsMergeRequestConnectionFragmentDoc,
 } from '../../graphql/gitlab/graphql';
-import {
-  mapAuthorMetricsFromMergeRequests,
-  mapReviewersFromMergeRequests,
-} from './helpers';
-import { renderContributorsList, renderReviewersList } from './render';
-import { Author, Reviewer } from './types';
-import pacMan from '../../assets/bean-eater.gif';
-import GlobalStats from '../GlobalStats';
+import { getTopContributors } from './helpers';
 
-const BASE_URL = import.meta.env.VITE_GITLAB_HOST;
+import pacMan from '../../assets/bean-eater.gif';
+import ContributorsList from './ContributorList';
+import ReviewersList from './ReviewersList';
+import { BASE_URL } from './constants';
+import { getFragmentData } from '../../graphql/gitlab';
 
 export default function Stats() {
   const mergeAfterDateInput = useRef<HTMLInputElement>(null);
@@ -25,28 +21,7 @@ export default function Stats() {
 
   if (error) return <div>Error! ${error.message}</div>;
 
-  let topAuthors: Author[] = [];
-  let topReviewers: Reviewer[] = [];
-  if (data?.projects) {
-    const mergeRequests: MergeMetricsMergeRequestFragment[] = [];
-    data.projects.nodes?.forEach((project) => {
-      const x = (
-        (project as MergeMetricsProjectFragment)
-          .mergeRequests as MergeMetricsMergeRequestConnectionFragment
-      ).nodes as MergeMetricsMergeRequestFragment[];
-      mergeRequests.push(...x);
-    });
-    const projectAuthors = mapAuthorMetricsFromMergeRequests(mergeRequests);
-    const projectReviewers = mapReviewersFromMergeRequests(mergeRequests);
-
-    projectAuthors.sort((a, b) => (a.mergeRequests > b.mergeRequests ? -1 : 1));
-    projectReviewers.sort((a, b) =>
-      a.timesReviewed > b.timesReviewed ? -1 : 1
-    );
-
-    topAuthors = projectAuthors;
-    topReviewers = projectReviewers;
-  }
+  const { topAuthors, topReviewers } = getTopContributors(data);
 
   return (
     <div>
@@ -84,8 +59,8 @@ export default function Stats() {
             <div className='top-developers'>
               <div className='top-list'>
                 {topAuthors &&
-                  topAuthors.map((author) => (
-                    <div className='top-list-item'>
+                  topAuthors.map((author, i) => (
+                    <div key={`top-author-${i}`} className='top-list-item'>
                       <img
                         src={
                           author.avatarUrl?.startsWith('https')
@@ -118,8 +93,8 @@ export default function Stats() {
             <div className='top-reviewers'>
               <div className='top-list'>
                 {topReviewers &&
-                  topReviewers.map((reviewer) => (
-                    <div className='top-list-item'>
+                  topReviewers.map((reviewer, i) => (
+                    <div key={`top-reviewer-${i}`} className='top-list-item'>
                       <img
                         src={
                           reviewer.avatarUrl?.startsWith('https')
@@ -139,44 +114,43 @@ export default function Stats() {
       )}
 
       {data && <h2>Projects</h2>}
-      {data?.projects?.nodes?.map((project) => {
-        const p = project as MergeMetricsProjectFragment;
+      {data?.projects?.nodes?.map((projectFragment, i) => {
+        const project = getFragmentData(
+          MergeMetricsProjectFragmentDoc,
+          projectFragment
+        );
+        const mergeRequestsConnection = getFragmentData(
+          MergeMetricsMergeRequestConnectionFragmentDoc,
+          project?.mergeRequests
+        );
+        if (!project) return;
+
         return (
-          <div className='project-item'>
+          <div key={`project-${i}`} className='project-item'>
             <h3>
-              <a target='_blank' href={BASE_URL + p.fullPath}>
-                {p.fullPath}
+              <a target='_blank' href={BASE_URL + project.fullPath}>
+                {project.fullPath}
               </a>
             </h3>
-            <GlobalStats project={project!} />
-            {(project &&
-              (p.mergeRequests as MergeMetricsMergeRequestConnectionFragment)
-                .count > 0 && (
-                <div className='project' key={p.id}>
-                  <h3>
-                    {
-                      (
-                        p.mergeRequests as MergeMetricsMergeRequestConnectionFragment
-                      ).count
-                    }{' '}
-                    Total Merge Requests
-                  </h3>
-                  <h3>Contributors</h3>
-                  <div>
-                    {(p.mergeRequests &&
-                      renderContributorsList(
-                        p.mergeRequests as MergeMetricsMergeRequestConnectionFragment
-                      )) ||
-                      ''}
-                  </div>
-                  <h3>Reviewers</h3>
-                  <div>
-                    {renderReviewersList(
-                      p.mergeRequests as MergeMetricsMergeRequestConnectionFragment
-                    ) || ''}
-                  </div>
+            {(mergeRequestsConnection && mergeRequestsConnection.count > 0 && (
+              <div className='project'>
+                <h3>{mergeRequestsConnection.count} Total Merge Requests</h3>
+                <h3>Contributors</h3>
+                <div>
+                  {project.mergeRequests && (
+                    <ContributorsList
+                      connectionFragment={project.mergeRequests}
+                    />
+                  )}
                 </div>
-              )) || <p>No Activity</p>}
+                <h3>Reviewers</h3>
+                <div>
+                  {project.mergeRequests && (
+                    <ReviewersList connectionFragment={project.mergeRequests} />
+                  )}
+                </div>
+              </div>
+            )) || <p>No Activity</p>}
           </div>
         );
       })}

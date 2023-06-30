@@ -4,7 +4,6 @@
 
 body {
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  transition: all 500ms;
   margin: 0 40px;
   font-size: 14px;
 }
@@ -13,127 +12,30 @@ a {
   color: rgb(0, 204, 255);
 }
 
-.header {
-  margin: 40px;
-  text-align: center;
-}
-
-.loader {
+.menu {
+  list-style: none;
   display: flex;
+  align-items: center;
   justify-content: center;
 }
 
-.merged-after-group {
-  display: flex;
-  gap: 10px;
-  justify-content: center;
-  align-items: center;
+.menu li {
+  display: block;
+  
 }
 
-.merged-after-group span,
-.merged-after-group input {
-  font-size: 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-}
-
-.project {
-  padding: 20px;
+.menu li a { 
+  border: solid 1px black;
   border-radius: 5px;
-  background-color: var(--black);
+  display: block;
+  padding: 6px 12px;
+  background-color: grey;
+  color: black;
+  font-weight: bold;
+  max-width: 250px;
+  transition: all 200ms;
 }
 
-.project-item {
-  margin: 30px 0;
-  padding: 10px;
-  background-color: #555;
-  border-radius: 5px;
-}
-
-.project-item h3 {
-  margin: 0 0 10px;
-}
-
-.contributors,
-.reviewers {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 100%;
-}
-
-.contributor, .reviewer {
-  display: flex;
-  box-sizing: border-box;
-  flex: 0 0 25%;
-  padding: 10px;
-}
-
-.contributor:nth-child(-n + 4), .reviewer:nth-child(-n + 4) {
-  color: lightgreen;
-  font-size: 16px;
-}
-
-.contributor .name, .reviewer .name {
-  display: flex;
-}
-
-.contributor .name img {
-  border-radius: 3px;
-  max-height: 50px;
-  margin: 0 15px 0 0;
-}
-
-.reviewer .name img {
-  border-radius: 3px;
-  max-height: 20px;
-  margin: 0 15px 0 0;
-}
-
-.contributor .stats {
-  font-size: 12px;
-}
-
-.top-developers,
-.top-reviewers {
-  padding: 20px;
-  border-radius: 5px;
-  background-color: var(--black);
-}
-
-.top-list {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.top-list-item {
-  display: flex;
-  padding: 5px 10px;
-  align-items: center;
-  flex: 0 0 25%;
-  box-sizing: border-box;
-}
-
-.top-list-item:nth-child(-n + 8) {
-  color: lightgreen;
-  font-size: 16px;
-}
-
-.top-list img {
-  max-width: 30px;
-  margin-right: 15px;
-}
-
-.top-list-item span {
-  display: inline-block;
-  height: 100%;
-}
-
-.global-stats {
-  font-size: 10px;
-  display: flex;
-  flex-direction: column;
-}
-
-.global-stats div {
-  display: flex;
-  gap: 5px;
+.menu li a:hover {
+  background-color: white;
 }

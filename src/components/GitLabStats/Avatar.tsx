@@ -1,18 +1,14 @@
-import { FragmentType, graphql, getFragmentData } from '../../graphql/gitlab';
+import { FragmentType, getFragmentData } from '../../graphql/gitlab';
+import { MergeMetricsUserCoreFragmentDoc } from '../../graphql/gitlab/graphql';
 import { BASE_URL } from './constants';
 
-const Avatar_User_Fragment = graphql(`
-  fragment AvatarUserFragment on UserCore {
-    avatarUrl
-  }
-`);
 
 interface AvatarProps {
-  user: FragmentType<typeof Avatar_User_Fragment>;
+  user: FragmentType<typeof MergeMetricsUserCoreFragmentDoc>;
 }
 
 const Avatar = (props: AvatarProps) => {
-  const user = getFragmentData(Avatar_User_Fragment, props.user);
+  const user = getFragmentData(MergeMetricsUserCoreFragmentDoc, props.user);
   return (
     <div className=''>
       <img

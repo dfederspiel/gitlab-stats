@@ -6,7 +6,7 @@ import getClient from './lib/apollo-client';
 
 const Menu = () => {
   return (
-    <ul>
+    <ul className='menu'>
       <li>
         <Link to={`gitlab`}>GitLab Stats</Link>
       </li>

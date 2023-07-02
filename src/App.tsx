@@ -6,9 +6,12 @@ import getClient from './lib/apollo-client';
 
 const Menu = () => {
   return (
-    <ul className='menu'>
+    <ul className="menu">
       <li>
         <Link to={`gitlab`}>GitLab Stats</Link>
+      </li>
+      <li>
+        <Link to={'user'}>Individual Stats</Link>
       </li>
     </ul>
   );
@@ -22,10 +25,10 @@ function App() {
         import.meta.env.VITE_GITLAB_PAT
       )}
     >
-      <div className='header'>
+      <div className="header">
         <Menu />
       </div>
-      <div className='content'>
+      <div className="content">
         <Outlet />
       </div>
     </ApolloProvider>

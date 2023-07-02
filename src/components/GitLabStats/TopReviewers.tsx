@@ -7,13 +7,13 @@ interface TopReviewersProps {
 
 const TopReviewers = ({ topReviewers }: TopReviewersProps) => {
   return (
-    <div className='project-item'>
+    <div className="project-item">
       <h3>Most Active Reviewers</h3>
-      <div className='top-reviewers'>
-        <div className='top-list'>
+      <div className="top-reviewers">
+        <div className="top-list">
           {topReviewers &&
             topReviewers.map((reviewer, i) => (
-              <div key={`top-reviewer-${i}`} className='top-list-item'>
+              <div key={`top-reviewer-${i}`} className="top-list-item">
                 <img
                   src={
                     reviewer.avatarUrl?.startsWith('https')

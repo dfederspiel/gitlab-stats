@@ -22,12 +22,12 @@ const ContributorsList = ({ connectionFragment }: ContributorsListProps) => {
     getAuthorMetricsFromMergeRequestConnection(requests);
 
   return (
-    <div className='contributors'>
+    <div className="contributors">
       {authors
         .sort((a, b) => (a.mergeRequests > b.mergeRequests ? -1 : 1))
         .map((n, i) => (
-          <div key={`contributor-${i}`} className='contributor'>
-            <div className='name'>
+          <div key={`contributor-${i}`} className="contributor">
+            <div className="name">
               <img
                 src={
                   n.avatarUrl.startsWith('https')
@@ -40,7 +40,7 @@ const ContributorsList = ({ connectionFragment }: ContributorsListProps) => {
               <span>
                 {n.name} ({n.mergeRequests})
               </span>
-              <div className='global-stats'>
+              <div className="global-stats">
                 <div>
                   <span>additions: {n.additions}</span>
                   <span>deletions: {n.deletions}</span>

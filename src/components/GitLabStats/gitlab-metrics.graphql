@@ -15,6 +15,8 @@ fragment MergeMetricsMergeRequest on MergeRequest {
   commits {
     nodes {
       title
+      description
+      webUrl
     }
   }
   author {
@@ -53,6 +55,17 @@ query MergeMetrics($projectIds: [ID!]!, $mergedAfter: Time!) {
   projects(ids: $projectIds) {
     nodes {
       ...MergeMetricsProject
+    }
+  }
+}
+
+query CurrentUser($mergedAfter: Time!) {
+  currentUser {
+    avatarUrl
+    name
+    username
+    authoredMergeRequests(mergedAfter: $mergedAfter) {
+      ...MergeMetricsMergeRequestConnection
     }
   }
 }

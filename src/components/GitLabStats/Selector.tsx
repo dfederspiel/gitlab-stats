@@ -8,12 +8,12 @@ const Selector = ({ dateChanged }: SelectorProps) => {
   const mergeAfterDateInput = useRef<HTMLInputElement>(null);
 
   return (
-    <div className='selector'>
+    <div className="selector">
       <span>Merged After</span>
-      <input ref={mergeAfterDateInput} type='date' />
+      <input ref={mergeAfterDateInput} type="date" />
       <input
-        type='button'
-        value='Go'
+        type="button"
+        value="Go"
         onClick={() => {
           if (mergeAfterDateInput.current?.value)
             dateChanged(mergeAfterDateInput.current?.value);

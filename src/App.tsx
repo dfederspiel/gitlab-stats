@@ -3,15 +3,22 @@ import './App.css';
 
 import { Link, Outlet } from 'react-router-dom';
 import getClient from './lib/apollo-client';
+import { useState } from 'react';
 
 const Menu = () => {
+  const [activeItem, setActiveItem] = useState('gitlab');
+
   return (
     <ul className="menu">
-      <li>
-        <Link to={`gitlab`}>GitLab Stats</Link>
+      <li className={activeItem === 'gitlab' ? 'active' : ''}>
+        <Link onClick={() => setActiveItem('gitlab')} to={`gitlab`}>
+          GitLab Stats
+        </Link>
       </li>
-      <li>
-        <Link to={'user'}>Individual Stats</Link>
+      <li className={activeItem === 'user' ? 'active' : ''}>
+        <Link onClick={() => setActiveItem('user')} to={'user'}>
+          Individual Stats
+        </Link>
       </li>
     </ul>
   );

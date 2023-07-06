@@ -1,12 +1,11 @@
-.selector {
-  display: flex;
-  gap: 10px;
+.date-selector {
+  display: flex; gap: 10px;
   justify-content: center;
   align-items: center;
 }
 
-.selector span,
-.selector input {
+.date-selector span,
+.date-selector input {
   font-size: 20px;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }

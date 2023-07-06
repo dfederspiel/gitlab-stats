@@ -1,0 +1,15 @@
+.panel { 
+  transition: all 200ms;
+  width: calc(100vw - 260px);
+  position: fixed;
+  padding: 30px;
+  top: -1000px;
+  left: 100px;
+  border-radius: 5px;
+  background-color: rgba(33,33,33,.9);
+  box-shadow: 10px 10px 15px #111;
+}
+
+.panel.open {
+  top: 20px;
+}

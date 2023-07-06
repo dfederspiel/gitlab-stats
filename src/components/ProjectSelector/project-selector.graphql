@@ -1,0 +1,37 @@
+fragment PageInfo on PageInfo {
+  startCursor
+  endCursor
+  hasNextPage
+  hasPreviousPage
+}
+
+fragment Project on Project {
+  id
+  name
+  fullPath
+  webUrl
+}
+
+fragment ProjectConnection on ProjectConnection {
+  edges {
+    cursor
+  }
+  pageInfo {
+    ...PageInfo
+  }
+  nodes {
+    ...Project
+  }
+}
+
+query Projects($first: Int, $last: Int, $before: String, $after: String) {
+  projects(
+    first: $first
+    last: $last
+    before: $before
+    after: $after
+    sort: "name_asc"
+  ) {
+    ...ProjectConnection
+  }
+}

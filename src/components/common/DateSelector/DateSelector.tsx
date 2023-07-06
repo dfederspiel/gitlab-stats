@@ -1,20 +1,19 @@
 import { useRef } from 'react';
-import './selector.css';
+import './styles.css';
 
 interface SelectorProps {
   dateChanged: (date: string) => void;
 }
-const Selector = ({ dateChanged }: SelectorProps) => {
+const DateSelector = ({ dateChanged }: SelectorProps) => {
   const mergeAfterDateInput = useRef<HTMLInputElement>(null);
 
   return (
-    <div className='selector'>
+    <div className="date-selector">
       <span>Merged After</span>
-      <input ref={mergeAfterDateInput} type='date' />
       <input
-        type='button'
-        value='Go'
-        onClick={() => {
+        ref={mergeAfterDateInput}
+        type="date"
+        onChange={() => {
           if (mergeAfterDateInput.current?.value)
             dateChanged(mergeAfterDateInput.current?.value);
         }}
@@ -23,4 +22,4 @@ const Selector = ({ dateChanged }: SelectorProps) => {
   );
 };
 
-export default Selector;
+export default DateSelector;

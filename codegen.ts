@@ -4,19 +4,21 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 const config: CodegenConfig = {
-  // schema: 'https://api.github.com/graphql',
+  documents: ['src/components/**/*.graphql', 'src/**/*.tsx'],
+  schema: `${process.env.VITE_GITLAB_HOST}/api/graphql`,
   generates: {
     './src/graphql/gitlab/': {
-      documents: ['src/components/GitLabStats/**/*.graphql', 'src/**/*.tsx'],
-      schema: `${process.env.VITE_GITLAB_HOST}/api/graphql`,
       preset: 'client',
       presetConfig: {
-        fragmentMasking: { unmaskFunctionName: 'getFragmentData' }
+        fragmentMasking: { unmaskFunctionName: 'getFragmentData' },
       },
       config: {
         enumsAsTypes: true,
         futureProofEnums: true,
       },
+    },
+    './src/graphql/gitlab.graphql': {
+      plugins: ['schema-ast'],
     },
   },
 };

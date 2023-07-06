@@ -1,6 +1,8 @@
 import { ApolloLink, HttpLink } from '@apollo/client';
 
-export const httpLink = new HttpLink({ uri: `${import.meta.env.VITE_GITLAB_HOST}/api/graphql` });
+export const httpLink = new HttpLink({
+  uri: `${import.meta.env.VITE_GITLAB_HOST}/api/graphql`,
+});
 
 export const authMiddleware = (pat: string) => {
   return new ApolloLink((operation, forward) => {
@@ -9,9 +11,9 @@ export const authMiddleware = (pat: string) => {
       headers: {
         ...headers,
         authorization: `Bearer ${pat}` || null,
-      }
+      },
     }));
 
     return forward(operation);
-  })
-}
+  });
+};

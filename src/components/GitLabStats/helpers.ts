@@ -1,5 +1,14 @@
 import { FragmentType, getFragmentData } from '../../graphql/gitlab';
-import { MergeMetricsDiffStatsFragmentDoc, MergeMetricsMergeRequestConnectionFragment, MergeMetricsMergeRequestConnectionFragmentDoc, MergeMetricsMergeRequestFragment, MergeMetricsMergeRequestFragmentDoc, MergeMetricsProjectFragmentDoc, MergeMetricsQuery, MergeMetricsUserCoreFragmentDoc } from '../../graphql/gitlab/graphql';
+import {
+  MergeMetricsDiffStatsFragmentDoc,
+  MergeMetricsMergeRequestConnectionFragment,
+  MergeMetricsMergeRequestConnectionFragmentDoc,
+  MergeMetricsMergeRequestFragment,
+  MergeMetricsMergeRequestFragmentDoc,
+  MergeMetricsProjectFragmentDoc,
+  MergeMetricsQuery,
+  MergeMetricsUserCoreFragmentDoc,
+} from '../../graphql/gitlab/graphql';
 import { Author, Reviewer } from './types';
 
 export const getTopContributors = (data?: MergeMetricsQuery) => {
@@ -8,7 +17,7 @@ export const getTopContributors = (data?: MergeMetricsQuery) => {
   if (data?.projects) {
     const mergeRequests: MergeMetricsMergeRequestFragment[] = [];
     data.projects.nodes?.forEach((project) => {
-      if (project) mergeRequests.push(...getProjectMergeRequests(project))
+      if (project) mergeRequests.push(...getProjectMergeRequests(project));
     });
     const projectAuthors = getAuthorMetricsFromMergeRequests(mergeRequests);
     const projectReviewers = getReviewersFromMergeRequests(mergeRequests);
@@ -22,11 +31,13 @@ export const getTopContributors = (data?: MergeMetricsQuery) => {
   }
   return {
     topAuthors,
-    topReviewers
-  }
-}
+    topReviewers,
+  };
+};
 
-export const getProjectMergeRequests = (project: FragmentType<typeof MergeMetricsProjectFragmentDoc>) => {
+export const getProjectMergeRequests = (
+  project: FragmentType<typeof MergeMetricsProjectFragmentDoc>
+) => {
   const mergeRequests: MergeMetricsMergeRequestFragment[] = [];
   const projectFragment = getFragmentData(
     MergeMetricsProjectFragmentDoc,
@@ -37,18 +48,15 @@ export const getProjectMergeRequests = (project: FragmentType<typeof MergeMetric
     projectFragment.mergeRequests
   );
 
-  mergeRequestConnectionFragment?.nodes?.forEach(
-    (mergeRequestFragment) => {
-      const mergeRequest = getFragmentData(
-        MergeMetricsMergeRequestFragmentDoc,
-        mergeRequestFragment
-      );
-      if (mergeRequest) mergeRequests.push(mergeRequest);
-    }
-  );
+  mergeRequestConnectionFragment?.nodes?.forEach((mergeRequestFragment) => {
+    const mergeRequest = getFragmentData(
+      MergeMetricsMergeRequestFragmentDoc,
+      mergeRequestFragment
+    );
+    if (mergeRequest) mergeRequests.push(mergeRequest);
+  });
   return mergeRequests;
 };
-
 
 export function getAuthorMetricsFromMergeRequests(
   nodes: MergeMetricsMergeRequestFragment[]
@@ -57,7 +65,10 @@ export function getAuthorMetricsFromMergeRequests(
 
   for (const request of nodes) {
     const author = authors.find((a) => a.name === request?.author?.name);
-    const diff = getFragmentData(MergeMetricsDiffStatsFragmentDoc, request.diffStatsSummary);
+    const diff = getFragmentData(
+      MergeMetricsDiffStatsFragmentDoc,
+      request.diffStatsSummary
+    );
     if (!diff) continue;
 
     if (author && request?.diffStatsSummary) {
@@ -114,9 +125,15 @@ export function getAuthorMetricsFromMergeRequestConnection(
   if (!connection.nodes) return authors;
 
   for (const projectFragment of connection.nodes) {
-    const project = getFragmentData(MergeMetricsMergeRequestFragmentDoc, projectFragment);
+    const project = getFragmentData(
+      MergeMetricsMergeRequestFragmentDoc,
+      projectFragment
+    );
     const author = authors.find((a) => a.name === project?.author?.name);
-    const diff = getFragmentData(MergeMetricsDiffStatsFragmentDoc, project?.diffStatsSummary);
+    const diff = getFragmentData(
+      MergeMetricsDiffStatsFragmentDoc,
+      project?.diffStatsSummary
+    );
 
     if (project && author && diff) {
       author.additions += diff.additions;
@@ -149,9 +166,15 @@ export function getReviewersFromMergeRequestConnection(
   if (!connection.nodes) return reviewers;
 
   for (const projectFragment of connection.nodes) {
-    const project = getFragmentData(MergeMetricsMergeRequestFragmentDoc, projectFragment);
+    const project = getFragmentData(
+      MergeMetricsMergeRequestFragmentDoc,
+      projectFragment
+    );
     project?.approvedBy?.nodes?.forEach((userFragment) => {
-      const user = getFragmentData(MergeMetricsUserCoreFragmentDoc, userFragment)
+      const user = getFragmentData(
+        MergeMetricsUserCoreFragmentDoc,
+        userFragment
+      );
       const reviewer = reviewers.find((r) => r.name === user?.name);
       if (!reviewer) {
         reviewers.push({

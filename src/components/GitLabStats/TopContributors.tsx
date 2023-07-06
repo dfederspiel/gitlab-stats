@@ -7,13 +7,13 @@ interface TopContributorsProps {
 
 const TopContributors = ({ topAuthors }: TopContributorsProps) => {
   return (
-    <div className='project-item'>
+    <div className="project-item">
       <h3>Most Active Contributors</h3>
-      <div className='top-developers'>
-        <div className='top-list'>
+      <div className="top-developers">
+        <div className="top-list">
           {topAuthors &&
             topAuthors.map((author, i) => (
-              <div key={`top-author-${i}`} className='top-list-item'>
+              <div key={`top-author-${i}`} className="top-list-item">
                 <img
                   src={
                     author.avatarUrl?.startsWith('https')
@@ -25,7 +25,7 @@ const TopContributors = ({ topAuthors }: TopContributorsProps) => {
                   <div>
                     {author.name} ({author.mergeRequests})
                   </div>
-                  <div className='global-stats'>
+                  <div className="global-stats">
                     <div>
                       <span>additions: {author.additions}</span>
                       <span>deletions: {author.deletions}</span>

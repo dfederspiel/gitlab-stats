@@ -11,6 +11,8 @@ import { getFragmentData } from '../../graphql/gitlab';
 import Project from './Project';
 import { useState } from 'react';
 
+import './styles.css';
+
 interface ProjectSelectorProps {
   onSelectionChanged(checked: string[]): void;
 }
@@ -26,7 +28,7 @@ const ProjectSelector = ({ onSelectionChanged }: ProjectSelectorProps) => {
     },
   });
 
-  const [checked, setChecked] = useState<string[]>([]);
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
 
   if (loading) return <>Loading...</>;
   if (error) return <>${error.message}</>;
@@ -39,7 +41,7 @@ const ProjectSelector = ({ onSelectionChanged }: ProjectSelectorProps) => {
 
   return (
     projectConnection && (
-      <div>
+      <div className="project-selector">
         {projectConnection.nodes?.map((projectFragment) => {
           const project = getFragmentData(ProjectFragmentDoc, projectFragment);
 
@@ -47,15 +49,15 @@ const ProjectSelector = ({ onSelectionChanged }: ProjectSelectorProps) => {
             project &&
             projectFragment && (
               <Project
-                selectedProjects={checked}
+                selectedProjects={selectedProjects}
                 onChecked={(value) => {
-                  const newChecked = [...checked];
+                  const newChecked = [...selectedProjects];
                   if (newChecked.includes(value))
                     newChecked.splice(newChecked.indexOf(value), 1);
                   else {
                     newChecked.push(value);
                   }
-                  setChecked(newChecked);
+                  setSelectedProjects(newChecked);
                   onSelectionChanged(newChecked);
                 }}
                 key={`project-${project.id}`}

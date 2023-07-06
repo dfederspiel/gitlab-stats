@@ -3,19 +3,23 @@ import { MergeMetricsDocument } from '../../graphql/gitlab/graphql';
 import { getTopContributors } from './helpers';
 
 import pacMan from '../../assets/bean-eater.gif';
-import Selector from './Selector';
+import DateSelector from '../common/DateSelector/DateSelector';
 import TopContributors from './TopContributors';
 import TopReviewers from './TopReviewers';
 import ProjectDetails from './ProjectDetails';
+import ProjectSelector from '../ProjectSelector/ProjectSelector';
+import { useState } from 'react';
+import Panel from '../common/Panel/Panel';
 
 import './gitlab-stats.css';
-import ProjectSelector from '../ProjectSelector/ProjectSelector';
-import { useEffect, useState } from 'react';
 
 export default function GitLabStats() {
   const [loadMergeMetrics, { loading, error, data }] =
     useLazyQuery(MergeMetricsDocument);
-  const [selectedProjects, setSelectedProjects] = useState<string[]>();
+
+  const [selectedProjects, setSelectedProjects] = useState<string[]>([]);
+  const [date, setDate] = useState<string>();
+  const [configOpen, setConfigOpen] = useState(false);
 
   if (error) return <div>Error! ${error.message}</div>;
 
@@ -25,21 +29,34 @@ export default function GitLabStats() {
     <div>
       <div className="header">
         <h1>GitLab UI Development Stats</h1>
-        <ProjectSelector
-          onSelectionChanged={(checked) => {
-            setSelectedProjects(checked);
+        <a onClick={() => setConfigOpen(!configOpen)}>Select Projects</a>
+        <Panel
+          title="Global Stats For:"
+          open={configOpen}
+          onClose={() => {
+            setConfigOpen(false);
+            if (date && selectedProjects.length > 0)
+              loadMergeMetrics({
+                variables: {
+                  projectIds: selectedProjects,
+                  mergedAfter: date,
+                },
+              });
           }}
-        />
-        <Selector
-          dateChanged={(newDate) => {
-            loadMergeMetrics({
-              variables: {
-                projectIds: selectedProjects || [],
-                mergedAfter: newDate,
-              },
-            });
-          }}
-        />
+        >
+          <>
+            <ProjectSelector
+              onSelectionChanged={(checked) => {
+                setSelectedProjects(checked);
+              }}
+            />
+            <DateSelector
+              dateChanged={(newDate) => {
+                setDate(newDate);
+              }}
+            />
+          </>
+        </Panel>
       </div>
       {loading && (
         <div className="loader">

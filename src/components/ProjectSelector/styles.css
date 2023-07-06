@@ -1,0 +1,6 @@
+.project-selector {
+  justify-content: left;
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+}

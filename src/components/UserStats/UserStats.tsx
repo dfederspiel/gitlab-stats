@@ -4,7 +4,7 @@ import {
   MergeMetricsMergeRequestConnectionFragmentDoc,
   MergeMetricsMergeRequestFragmentDoc,
 } from '../../graphql/gitlab/graphql';
-import Selector from '../GitLabStats/Selector';
+import Selector from '../common/DateSelector/DateSelector';
 import pacMan from '../../assets/bean-eater.gif';
 import { FragmentType, getFragmentData } from '../../graphql/gitlab';
 import User from '../common/UserList';

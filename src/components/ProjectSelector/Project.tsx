@@ -14,14 +14,16 @@ const Project = ({
 }: ProjectProps) => {
   const project = getFragmentData(ProjectFragmentDoc, projectFragment);
   return (
-    <div>
-      <input
-        checked={selectedProjects.includes(project.id)}
-        onClick={() => onChecked(project.id)}
-        type="checkbox"
-      />
-      <label>{project.name}</label>
-    </div>
+    <>
+      <label>
+        <input
+          checked={selectedProjects.includes(project.id)}
+          onChange={() => onChecked(project.id)}
+          type="checkbox"
+        />
+        {project.name}
+      </label>
+    </>
   );
 };
 
